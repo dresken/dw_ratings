@@ -37,6 +37,8 @@ $seasons = array(
     #"all" => range(1,827)
 );
 ?>
+Source code available on github: <a href='https://github.com/dresken/dw_ratings'>https://github.com/dresken/dw_ratings</a>
+<br/>
 You should not reference this page, it is just a calculator. Please use the following as a reference for the information: <a href='http://guide.doctorwhonews.net/info.php?detail=ratings'>http://guide.doctorwhonews.net/info.php?detail=ratings</a>
 <h1>Original Sources</h1>
 <ul>
