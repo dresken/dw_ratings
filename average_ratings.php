@@ -31,7 +31,7 @@ $seasons = array(
     "series5" => range(757,769),  "series6" => range(771,783),
     "series7" => array_merge(range(785,789),range(791,798)), # excludes xmas special "the snowmen"
     "specials2013" => range(799,800),
-    "series8" => range(801,812),  "series9" => range(814,825),  #"series10" => range(,),
+    "series8" => range(801,812),  "series9" => range(814,825),  "series10" => range(828,840)
 
     #"xmas_all" => array(710,724,738,752,755, 770,784,790,800,813,826,827),
     #"all" => range(1,827)
@@ -86,17 +86,23 @@ foreach ($seasons as $season => $episodes) {
     $math = "(";
     $listep = "";
     $sources = array();
+    $incomplete = false;
     // For each episode tally etc
     foreach ($episodes as $episode) {
-        $count++;
-        $tally += $ratings[$episode];
-        $math .= $ratings[$episode]." + ";
-        $listep .= $episode.", ";
-        $source = intval(floor($episode/100)*100);
-        $sources[$source] = true;
+        if (isset($ratings[$episode]) && $ratings[$episode] > 0) {
+            $count++;
+            $tally += $ratings[$episode];
+            $math .= $ratings[$episode]." + ";
+            $listep .= $episode.", ";
+            $source = intval(floor($episode/100)*100);
+            $sources[$source] = true;
+        } else {
+            $incomplete = true;
+        }
     }
     $math = rtrim($math,"+ ").") / $count"; //finalise printable equation
     $listep = rtrim($listep, ", ");
+    if ($incomplete) { $listep .= ", INCOMPLETE"; }
     $average = round($tally / $count,2); // Calculate the average - rounded to 2 dp
     // Output info
     print "<tr>";
