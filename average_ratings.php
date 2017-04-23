@@ -67,6 +67,7 @@ foreach ($pages as $page) {
         $ratings[$index] = (float) rtrim($tds->item(6)->nodeValue, 'm'); //Rating converted to a number
     }
 }
+print "<li>Current time: ".gmdate("Y-m-d H:i:s T")."</li>";
 ?>
 </ul>
 <h1>Ratings averages</h1>
