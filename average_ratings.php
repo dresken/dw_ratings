@@ -104,7 +104,7 @@ foreach ($seasons as $season => $episodes) {
     $math = rtrim($math,"+ ").") / $count"; //finalise printable equation
     $listep = rtrim($listep, ", ");
     if ($incomplete) { $listep .= ", INCOMPLETE"; }
-    $average = round($tally / $count,2); // Calculate the average - rounded to 2 dp
+    $average = number_format(round($tally / $count,2),2); // Calculate the average - rounded to 2 dp
     // Output info
     print "<tr>";
     print "<td>$season</td>";
