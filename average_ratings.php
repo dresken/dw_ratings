@@ -31,7 +31,7 @@ $seasons = array(
     "series5" => range(757,769),  "series6" => range(771,783),
     "series7" => array_merge(range(785,789),range(791,798)), # excludes xmas special "the snowmen"
     "specials2013" => range(799,800),
-    "series8" => range(801,812),  "series9" => range(814,825),  "series10" => range(828,840)
+    "series8" => range(801,812),  "series9" => range(814,825),  "series10" => range(828,839)
 
     #"xmas_all" => array(710,724,738,752,755, 770,784,790,800,813,826,827),
     #"all" => range(1,827)
@@ -46,13 +46,18 @@ You should not reference this page, it is just a calculator. Please use the foll
 foreach ($pages as $page) {
     $file = "cache/dw-ratings-$page.html";
     $url = "http://guide.doctorwhonews.net/info.php?detail=ratings&start=$page&type=date&order=asc";
+    $age = count($pages)-($page/100);
+    $refreshed="";
     // Decide whether to renew cache
-    if (! file_exists($file) or filemtime($file) < strtotime("-1 day")) {
+    if (! file_exists($file) 
+    or ($age == 1 and filemtime($file) < strtotime("-6 hours"))
+    or (filemtime($file) < strtotime("-$age days") and mt_rand(0,count($pages)) == 0 )) {
         file_put_contents("$file.tmp", fopen($url, 'r'));
         rename("$file.tmp", "$file");
+        $refreshed="*";
     }
     $mtime = gmdate("Y-m-d H:i:s T", filemtime($file));
-    print "<li><a href='$url'>Page $page</a> (retrieved $mtime)</li>";
+    print "<li><a href='$url'>Page $page</a> (retrieved $mtime$refreshed)</li>";
     $DOM = new DOMDocument;
     $internalErrors = libxml_use_internal_errors(true); //Disable error reporting as HTML is not well formed
     $DOM->loadHTMLFile("$file");
@@ -63,8 +68,10 @@ foreach ($pages as $page) {
     // Extract data from the row (header is ignored)
     for ($i = 1; $i < $trs->length; $i++) {
         $tds = $trs->item($i)->getElementsByTagName('td');
-        $index = (int) $tds->item(0)->nodeValue; // Epsiodes number
-        $ratings[$index] = (float) rtrim($tds->item(6)->nodeValue, 'm'); //Rating converted to a number
+        if ($tds->item(6)->childNodes->item(0) instanceof DOMText) {
+            $index = (int) $tds->item(0)->nodeValue; // Epsiodes number
+            $ratings[$index] = (float) rtrim($tds->item(6)->nodeValue, 'm'); //Rating converted to a number
+        }
     }
 }
 print "<li>Current time: ".gmdate("Y-m-d H:i:s T")."</li>";
@@ -103,9 +110,12 @@ foreach ($seasons as $season => $episodes) {
     }
     $math = rtrim($math,"+ ").") / $count"; //finalise printable equation
     $listep = rtrim($listep, ", ");
-    if ($incomplete) { $listep .= ", INCOMPLETE"; }
     $average = number_format(round($tally / $count,2),2); // Calculate the average - rounded to 2 dp
     // Output info
+    if ($incomplete) { 
+        $listep .= ", <b>INCOMPLETE</b>";
+        $average = "<i>~".$average."</i>";
+    }
     print "<tr>";
     print "<td>$season</td>";
     print "<td>$average</td>";
